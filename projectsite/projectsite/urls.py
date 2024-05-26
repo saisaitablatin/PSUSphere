@@ -21,6 +21,7 @@ from studentorg.views import (
     HomePageView,
     ChartView,
     PieCountbySeverity,
+    LineCountbyMonth,
     OrganizationList,
     OrganizationCreateView,
     OrganizationUpdateView,
