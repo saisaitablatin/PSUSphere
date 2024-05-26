@@ -20,6 +20,7 @@ from django.urls import path, re_path
 from studentorg.views import (
     HomePageView,
     ChartView,
+    PieCountbySeverity,
     OrganizationList,
     OrganizationCreateView,
     OrganizationUpdateView,
@@ -56,6 +57,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.HomePageView.as_view(), name="home"),
     path('dashboard_chart', ChartView.as_view(), name='dashboard-chart'),
+    path('chart/', PieCountbySeverity, name='chart'),
     path("organization_list", OrganizationList.as_view(), name="organization-list"),
     path(
         "organization_list/add",
