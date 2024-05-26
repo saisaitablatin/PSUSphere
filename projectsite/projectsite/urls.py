@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from studentorg.views import (
     HomePageView,
+    ChartView,
     OrganizationList,
     OrganizationCreateView,
     OrganizationUpdateView,
@@ -54,6 +55,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.HomePageView.as_view(), name="home"),
+    path('dashboard_chart', ChartView.as_view(), name='dashboard-chart'),
     path("organization_list", OrganizationList.as_view(), name="organization-list"),
     path(
         "organization_list/add",
