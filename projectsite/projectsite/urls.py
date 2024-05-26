@@ -22,6 +22,7 @@ from studentorg.views import (
     ChartView,
     PieCountbySeverity,
     LineCountbyMonth,
+    MultilineIncidentTop3Country,
     OrganizationList,
     OrganizationCreateView,
     OrganizationUpdateView,
@@ -58,6 +59,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.HomePageView.as_view(), name="home"),
     path('dashboard_chart', ChartView.as_view(), name='dashboard-chart'),
+    path('lineChart/', LineCountbyMonth, name='chart'),
+    path('multilineChart/', MultilineIncidentTop3Country, name='chart'),
     path('chart/', PieCountbySeverity, name='chart'),
     path("organization_list", OrganizationList.as_view(), name="organization-list"),
     path(
