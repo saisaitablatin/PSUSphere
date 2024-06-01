@@ -1,15 +1,71 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
   <div class="page-inner">
-    <h4 class="page-title">Chart.js</h4>
-    <div class="page-category">
-      Simple yet flexible JavaScript charting for designers & developers. Please checkout their
-      <a href="https://www.chartjs.org/" target="_blank">full documentation</a>.
-    </div>
+    <p style="margin-top: 10vmin;"></p>
     <div class="row">
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Line Chart</div>
+            <div class="card-title">Organizations By College</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="obc-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Students Per Program</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="spp-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Program Enrollment Distribution</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="ped-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Student Enrollment Trends Over Time</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="setot-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Organization Membership Distribution</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="omd-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Fire Incidents This Year</div>
           </div>
           <div class="card-body">
             <div class="chart-container">
@@ -21,11 +77,11 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Bar Chart</div>
+            <div class="card-title">Fire Incidents Severity Count</div>
           </div>
           <div class="card-body">
             <div class="chart-container">
-              <canvas id="barChart"></canvas>
+              <canvas id="pieChart"></canvas>
             </div>
           </div>
         </div>
@@ -33,55 +89,7 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Pie Chart</div>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="pieChart" style="width: 50%; height: 50%"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Doughnut Chart</div>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="doughnutChart" style="width: 50%; height: 50%"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Radar Chart</div>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="radarChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Bubble Chart</div>
-          </div>
-          <div class="card-body">
-            <div class="chart-container">
-              <canvas id="bubbleChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Multiple Line Chart</div>
+            <div class="card-title">Barangay Fire Incidents This Year</div>
           </div>
           <div class="card-body">
             <div class="chart-container">
@@ -93,26 +101,12 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Multiple Bar Chart</div>
+            <div class="card-title">Fire Incidents History</div>
           </div>
           <div class="card-body">
             <div class="chart-container">
               <canvas id="multipleBarChart"></canvas>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Chart with HTML Legends</div>
-          </div>
-          <div class="card-body">
-            <div class="card-sub">Sometimes you need a very complex legend. In these cases, it makes sense to generate an HTML legend. Charts provide a generateLegend() method on their prototype that returns an HTML string for the legend.</div>
-            <div class="chart-container">
-              <canvas id="htmlLegendsChart"></canvas>
-            </div>
-            <div id="myChartLegend"></div>
           </div>
         </div>
       </div>
@@ -122,16 +116,12 @@
 {% block chart %}
   <script>
     function loadChartData() {
-      console.log('asdsa')
-      // pieChart
       fetch('/chart/')
         .then((response) => response.json())
         .then((data) => {
           var severityLevels = Object.keys(data)
           var counts = Object.values(data)
           var pieChart = document.getElementById('pieChart').getContext('2d')
-    
-          console.log('call')
     
           new Chart(pieChart, {
             type: 'pie',
@@ -175,7 +165,6 @@
           })
         })
         .catch((error) => console.error('Error:', error))
-      //   lineChart
       fetch('/lineChart/')
         .then((response) => response.json())
         .then((result_with_month_names) => {
@@ -189,10 +178,10 @@
               labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
               datasets: [
                 {
-                  label: 'Active Users',
-                  borderColor: '#1d7af3',
+                  label: 'Fire Incidents',
+                  borderColor: '#e25822',
                   pointBorderColor: '#FFF',
-                  pointBackgroundColor: '#1d7af3',
+                  pointBackgroundColor: '#e25822',
                   pointBorderWidth: 2,
                   pointHoverRadius: 4,
                   pointHoverBorderWidth: 1,
@@ -230,7 +219,6 @@
           })
         })
         .catch((error) => console.error('Error:', error))
-      //   multiLine
       fetch('/multilineChart/')
         .then((response) => response.json())
         .then((result_with_month_names) => {
@@ -335,7 +323,6 @@
           })
         })
         .catch((error) => console.error('Error:', error))
-      //   multiBarChart
       fetch('/multiBarChart/')
         .then((response) => response.json())
         .then((result) => {
@@ -429,8 +416,195 @@
         })
         .catch((error) => console.error('Error:', error))
     }
-    
     loadChartData()
+  </script>
+  <script>
+    async function fetchData(url) {
+      const response = await fetch(url)
+      const data = await response.json()
+      return data
+    }
+    
+    async function renderStudentsPerProgramChart() {
+      const data = await fetchData('/students_per_program/')
+      const labels = data.map((item) => item.prog_name)
+      const values = data.map((item) => item.student_count)
+    
+      const ctx = document.getElementById('spp-chart').getContext('2d')
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Number of Students',
+              data: values,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+    }
+    
+    async function renderOrganizationsByCollegeChart() {
+      const data = await fetchData('/organizations_by_college/')
+      const labels = data.map((item) => item.college_name)
+      const values = data.map((item) => item.org_count)
+    
+      const ctx = document.getElementById('obc-chart').getContext('2d')
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Number of Organizations',
+              data: values,
+              backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
+              borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                let sum = ctx.dataset.data.reduce((a, b) => a + b, 0)
+                let percentage = ((value * 100) / sum).toFixed(2) + '%'
+                return percentage
+              },
+              color: '#000'
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      })
+    }
+    
+    async function renderProgramEnrollmentDistributionChart() {
+      const data = await fetchData('/program_enrollment_distribution/')
+      const labels = data.map((item) => item.prog_name)
+      const values = data.map((item) => item.student_count)
+    
+      const ctx = document.getElementById('ped-chart').getContext('2d')
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Number of Students',
+              data: values,
+              backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)'],
+              borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)'],
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            datalabels: {
+              formatter: (value, ctx) => {
+                let sum = ctx.dataset.data.reduce((a, b) => a + b, 0)
+                let percentage = ((value * 100) / sum).toFixed(2) + '%'
+                return percentage
+              },
+              color: '#000'
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      })
+    }
+    
+    async function renderStudentEnrollmentTrendsChart() {
+      const data = await fetchData('/student_enrollment_trends/')
+      const labels = data.map((item) => item.year)
+      const values = data.map((item) => item.student_count)
+    
+      const ctx = document.getElementById('setot-chart').getContext('2d')
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Number of Students',
+              data: values,
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1,
+              fill: false,
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+    }
+    
+    async function renderOrganizationMembershipDistributionChart() {
+      const data = await fetchData('/organization_membership_distribution/')
+      const labels = data.map((item) => item.organization_name)
+      const values = data.map((item) => item.member_count)
+    
+      const ctx = document.getElementById('omd-chart').getContext('2d')
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Number of Members',
+              data: values,
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          scales: {
+            x: {
+              beginAtZero: true
+            },
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      })
+    }
+    
+    renderStudentsPerProgramChart()
+    renderOrganizationsByCollegeChart()
+    renderProgramEnrollmentDistributionChart()
+    renderStudentEnrollmentTrendsChart()
+    renderOrganizationMembershipDistributionChart()
   </script>
 
   <script>

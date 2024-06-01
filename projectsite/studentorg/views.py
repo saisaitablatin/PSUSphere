@@ -3,7 +3,15 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from studentorg.models import Organization, OrgMember, Student, College, Program
+from studentorg.models import (
+    Organization,
+    OrgMember,
+    Student,
+    College,
+    Program,
+    FireIncident,
+    FireLocation,
+)
 from studentorg.forms import (
     OrganizationForm,
     OrgMemberForm,
@@ -231,7 +239,7 @@ class ProgramDeleteView(DeleteView):
 def PieCountbySeverity(request):
     query = """
     SELECT severity_level, COUNT(*) as count
-    FROM fire_incident
+    FROM studentorg_fireincident
     GROUP BY severity_level
     """
     data = {}
@@ -254,7 +262,7 @@ def LineCountbyMonth(request):
 
     result = {month: 0 for month in range(1, 13)}
 
-    incidents_per_month = Incident.objects.filter(
+    incidents_per_month = FireIncident.objects.filter(
         date_time__year=current_year
     ).values_list("date_time", flat=True)
 
@@ -294,17 +302,17 @@ def MultilineIncidentTop3Country(request):
         strftime('%m', fi.date_time) AS month,
         COUNT(fi.id) AS incident_count
     FROM 
-        fire_incident fi
+        studentorg_fireincident fi
     JOIN 
-        fire_locations fl ON fi.location_id = fl.id
+        studentorg_firelocation fl ON fi.location_id = fl.id
     WHERE 
         fl.country IN (
             SELECT 
                 fl_top.country
             FROM 
-                fire_incident fi_top
+                studentorg_fireincident fi_top
             JOIN 
-                fire_locations fl_top ON fi_top.location_id = fl_top.id
+                studentorg_firelocation fl_top ON fi_top.location_id = fl_top.id
             WHERE 
                 strftime('%Y', fi_top.date_time) = strftime('%Y', 'now')
             GROUP BY 
@@ -362,7 +370,7 @@ def multipleBarbySeverity(request):
         strftime('%m', fi.date_time) AS month,
         COUNT(fi.id) AS incident_count
     FROM 
-        fire_incident fi
+        studentorg_fireincident fi
     GROUP BY fi.severity_level, month
     """
 
@@ -388,3 +396,86 @@ def multipleBarbySeverity(request):
         result[level] = dict(sorted(result[level].items()))
 
     return JsonResponse(result)
+
+
+def studentsPerProgram(request):
+    query = """
+        SELECT sp.prog_name, COUNT(ss.id) AS student_count
+        FROM studentorg_student ss
+        JOIN studentorg_program sp ON ss.program_id = sp.id
+        GROUP BY sp.prog_name
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+    # Convert the result to a list of dictionaries
+    result = [{"prog_name": row[0], "student_count": row[1]} for row in rows]
+
+    return JsonResponse(result, safe=False)
+
+
+def organizationsByCollege(request):
+    query = """
+        SELECT sc.college_name, COUNT(so.id) AS org_count
+        FROM studentorg_organization so
+        JOIN studentorg_college sc ON so.college_id = sc.id
+        GROUP BY sc.college_name
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+    # Convert the result to a list of dictionaries
+    result = [{"college_name": row[0], "org_count": row[1]} for row in rows]
+
+    return JsonResponse(result, safe=False)
+
+
+def programEnrollmentDistribution(request):
+    query = """
+        SELECT sp.prog_name, COUNT(ss.id) AS student_count
+        FROM studentorg_student ss
+        JOIN studentorg_program sp ON ss.program_id = sp.id
+        GROUP BY sp.prog_name
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+    # Convert the result to a list of dictionaries
+    result = [{"prog_name": row[0], "student_count": row[1]} for row in rows]
+
+    return JsonResponse(result, safe=False)
+
+
+def studentEnrollmentTrends(request):
+    query = """
+        SELECT strftime('%Y', created_at) AS year, COUNT(id) AS student_count
+        FROM studentorg_student
+        GROUP BY year
+        ORDER BY year
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+    result = [{"year": row[0], "student_count": row[1]} for row in rows]
+    return JsonResponse(result, safe=False)
+
+
+def organizationMembershipDistribution(request):
+    query = """
+        SELECT so.name AS organization_name, COUNT(som.id) AS member_count
+        FROM studentorg_orgmember som
+        JOIN studentorg_organization so ON som.organization_id = so.id
+        GROUP BY so.name
+        ORDER BY member_count DESC
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+    result = [{"organization_name": row[0], "member_count": row[1]} for row in rows]
+    return JsonResponse(result, safe=False)

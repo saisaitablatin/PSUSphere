@@ -28,6 +28,11 @@ from studentorg.views import (
     OrganizationCreateView,
     OrganizationUpdateView,
     OrganizationDeleteView,
+    studentsPerProgram,
+    organizationsByCollege,
+    programEnrollmentDistribution,
+    studentEnrollmentTrends,
+    organizationMembershipDistribution,
 )
 from studentorg.views import (
     OrgMemberList,
@@ -58,12 +63,27 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.HomePageView.as_view(), name="home"),
-    path("dashboard_chart/", ChartView.as_view(), name="dashboard-chart"),
+    # path("", views.HomePageView.as_view(), name="home"),
+    path("", ChartView.as_view(), name="dashboard-chart"),
     path("lineChart/", LineCountbyMonth, name="chart"),
     path("multilineChart/", MultilineIncidentTop3Country, name="chart"),
     path("multiBarChart/", multipleBarbySeverity, name="chart"),
     path("chart/", PieCountbySeverity, name="chart"),
+    path("students_per_program/", studentsPerProgram, name="chart"),
+    path("organizations_by_college/", organizationsByCollege, name="chart"),
+    path(
+        "program_enrollment_distribution/", programEnrollmentDistribution, name="chart"
+    ),
+    path(
+        "student_enrollment_trends/",
+        studentEnrollmentTrends,
+        name="chart",
+    ),
+    path(
+        "organization_membership_distribution/",
+        organizationMembershipDistribution,
+        name="chart",
+    ),
     path("organization_list", OrganizationList.as_view(), name="organization-list"),
     path(
         "organization_list/add",
