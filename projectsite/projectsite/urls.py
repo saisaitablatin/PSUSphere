@@ -64,7 +64,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # path("", views.HomePageView.as_view(), name="home"),
+    path("", views.HomePageView.as_view(), name="home"),
     path("", ChartView.as_view(), name="dashboard-chart"),
     path("lineChart/", LineCountbyMonth, name="chart"),
     path("multilineChart/", MultilineIncidentTop3Country, name="chart"),

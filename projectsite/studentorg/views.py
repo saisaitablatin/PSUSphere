@@ -41,7 +41,7 @@ from datetime import datetime
 class HomePageView(ListView):
     model = Organization
     context_object_name = "home"
-    template_name = "home.html"
+    template_name = "chart.html"
 
 
 class ChartView(ListView):
