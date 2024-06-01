@@ -84,6 +84,7 @@ urlpatterns = [
         organizationMembershipDistribution,
         name="chart",
     ),
+    path("stations/", map_station, name="map-station"),
     path("organization_list", OrganizationList.as_view(), name="organization-list"),
     path(
         "organization_list/add",

@@ -479,3 +479,12 @@ def organizationMembershipDistribution(request):
         rows = cursor.fetchall()
     result = [{"organization_name": row[0], "member_count": row[1]} for row in rows]
     return JsonResponse(result, safe=False)
+
+
+def map_station(request):
+    fireStations = FireStation.objects.values("name", "latitude", "longitude")
+    fireStations_list = list(fireStations)
+
+    context = {"fireStations": fireStations_list}
+
+    return render(request, "map_station.html", context)
