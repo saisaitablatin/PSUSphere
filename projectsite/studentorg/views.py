@@ -25,14 +25,15 @@ from django.db.models import Count
 from datetime import datetime
 
 
-
 @method_decorator(login_required, name="dispatch")
 class HomePageView(ListView):
     model = Organization
     context_object_name = "home"
     template_name = "home.html"
-    class ChartView(ListView):
-    template_name = 'chart.html'
+
+
+class ChartView(ListView):
+    template_name = "chart.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,7 +41,6 @@ class HomePageView(ListView):
 
     def get_queryset(self, *args, **kwargs):
         pass
-
 
 
 class OrganizationList(ListView):
@@ -227,12 +227,13 @@ class ProgramDeleteView(DeleteView):
     template_name = "program_del.html"
     success_url = reverse_lazy("program-list")
 
+
 def PieCountbySeverity(request):
-    query = '''
+    query = """
     SELECT severity_level, COUNT(*) as count
     FROM fire_incident
     GROUP BY severity_level
-    '''
+    """
     data = {}
     with connection.cursor() as cursor:
         cursor.execute(query)
@@ -245,14 +246,17 @@ def PieCountbySeverity(request):
         data = {}
 
     return JsonResponse(data)
+
+
 def LineCountbyMonth(request):
 
     current_year = datetime.now().year
 
     result = {month: 0 for month in range(1, 13)}
 
-    incidents_per_month = Incident.objects.filter(date_time__year=current_year) \
-        .values_list('date_time', flat=True)
+    incidents_per_month = Incident.objects.filter(
+        date_time__year=current_year
+    ).values_list("date_time", flat=True)
 
     # Counting the number of incidents per month
     for date_time in incidents_per_month:
@@ -261,17 +265,30 @@ def LineCountbyMonth(request):
 
     # If you want to convert month numbers to month names, you can use a dictionary mapping
     month_names = {
-        1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
-        7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
+        1: "Jan",
+        2: "Feb",
+        3: "Mar",
+        4: "Apr",
+        5: "May",
+        6: "Jun",
+        7: "Jul",
+        8: "Aug",
+        9: "Sep",
+        10: "Oct",
+        11: "Nov",
+        12: "Dec",
     }
 
     result_with_month_names = {
-        month_names[int(month)]: count for month, count in result.items()}
+        month_names[int(month)]: count for month, count in result.items()
+    }
 
     return JsonResponse(result_with_month_names)
+
+
 def MultilineIncidentTop3Country(request):
 
-    query = '''
+    query = """
         SELECT 
         fl.country,
         strftime('%m', fi.date_time) AS month,
@@ -301,7 +318,7 @@ def MultilineIncidentTop3Country(request):
         fl.country, month
     ORDER BY 
         fl.country, month;
-    '''
+    """
 
     with connection.cursor() as cursor:
         cursor.execute(query)
@@ -336,8 +353,10 @@ def MultilineIncidentTop3Country(request):
         result[country] = dict(sorted(result[country].items()))
 
     return JsonResponse(result)
+
+
 def multipleBarbySeverity(request):
-    query = '''
+    query = """
     SELECT 
         fi.severity_level,
         strftime('%m', fi.date_time) AS month,
@@ -345,7 +364,7 @@ def multipleBarbySeverity(request):
     FROM 
         fire_incident fi
     GROUP BY fi.severity_level, month
-    '''
+    """
 
     with connection.cursor() as cursor:
         cursor.execute(query)
