@@ -7,6 +7,7 @@ from .models import (
     OrgMember,
     FireIncident,
     FireLocation,
+    FireStation,
 )
 
 # Register your models here.
@@ -45,6 +46,11 @@ class OrgMemberAdmin(admin.ModelAdmin):
             return member.program
         except Student.DoesNotExist:
             return None
+
+
+@admin.register(FireStation)
+class FireStationAdmin(admin.ModelAdmin):
+    list_display = ("name", "latitude", "longitude", "address", "location")
 
 
 admin.site.register(FireIncident)

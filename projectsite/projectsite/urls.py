@@ -33,6 +33,7 @@ from studentorg.views import (
     programEnrollmentDistribution,
     studentEnrollmentTrends,
     organizationMembershipDistribution,
+    map_station,
 )
 from studentorg.views import (
     OrgMemberList,

@@ -1,3 +1,6 @@
+import random
+import json
+from datetime import datetime
 from django.shortcuts import render
 
 # Create your views here.
@@ -11,6 +14,7 @@ from studentorg.models import (
     Program,
     FireIncident,
     FireLocation,
+    FireStation,
 )
 from studentorg.forms import (
     OrganizationForm,
@@ -481,10 +485,73 @@ def organizationMembershipDistribution(request):
     return JsonResponse(result, safe=False)
 
 
+# Predefined coordinates for barangays in Puerto Princesa City
+barangay_coordinates = {
+    "Barangay San Pedro": (9.759001431851921, 118.75786335104155),
+    "Barangay Mandaragat": (9.748646551957371, 118.73964419467723),
+    "Barangay San Miguel": (9.74757389879427, 118.75642401298171),
+    "Barangay San Jose": (9.794098800097737, 118.75921266844219),
+    "Barangay Tiniguiban": (9.771414551960454, 118.74452901673914),
+    "Barangay San Manuel": (9.771700446692131, 118.76425827599432),
+    "Barangay Santa Monica": (9.788931598544831, 118.73093532877895),
+    "Barangay Tagburos": (9.822344379670465, 118.74394796348989),
+    "Barangay Manggahan": (9.73990456054043, 118.73908841261942),
+}
+
+
 def map_station(request):
-    fireStations = FireStation.objects.values("name", "latitude", "longitude")
-    fireStations_list = list(fireStations)
+    city = request.GET.get("city", None)
 
-    context = {"fireStations": fireStations_list}
+    fireStations = FireStation.objects.all()
+    fireIncidents = FireIncident.objects.all()
 
-    return render(request, "map_station.html", context)
+    if city:
+        fireStations = fireStations.filter(location__country=city)
+        fireIncidents = fireIncidents.filter(location__country=city)
+
+    fireStations_list = list(fireStations.values("name", "latitude", "longitude"))
+    for station in fireStations_list:
+        station["latitude"] = float(station["latitude"])
+        station["longitude"] = float(station["longitude"])
+
+    fireIncidents_list = []
+    for incident in fireIncidents:
+        if incident.latitude is None or incident.longitude is None:
+            barangay_name = incident.location.country.split(",")[
+                0
+            ].strip()  # Assuming location country stores barangay name
+            if barangay_name in barangay_coordinates:
+                incident.latitude = random.uniform(
+                    barangay_coordinates[barangay_name][0] - 0.008,
+                    barangay_coordinates[barangay_name][0] + 0.008,
+                )
+                incident.longitude = random.uniform(
+                    barangay_coordinates[barangay_name][1] - 0.008,
+                    barangay_coordinates[barangay_name][1] + 0.008,
+                )
+            else:
+                # Generate random coordinates within the initial map view bounds as a fallback
+                incident.latitude = random.uniform(9.805, 9.828)
+                incident.longitude = random.uniform(118.710, 118.740)
+            incident.save()
+
+        fireIncidents_list.append(
+            {
+                "date_time": incident.date_time.isoformat(),
+                "severity_level": incident.severity_level,
+                "latitude": float(incident.latitude),
+                "longitude": float(incident.longitude),
+                "location_country": incident.location.country,
+            }
+        )
+
+    cities = FireLocation.objects.values_list("country", flat=True).distinct()
+
+    context = {
+        "fireStations": fireStations_list,
+        "fireIncidents": json.dumps(fireIncidents_list),
+        "cities": cities,
+        "selected_city": city,
+    }
+
+    return render(request, "mapstation.html", context)
